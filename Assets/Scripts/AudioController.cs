@@ -1,78 +1,88 @@
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.UI;
 
 public class AudioController : MonoBehaviour
 {
-    private const string MasterName = "Master";
-    private const string MusicName = "MusicVolume";
-    private const string EffectName = "SFXVolume";
 
-    private const float _volumeToDbFactor = 20;
+    private readonly string[] _mixerNames =
+    {
+    VolumeController.MasterName,
+    VolumeController.MusicName,
+    VolumeController.EffectName
+    };
 
-    [SerializeField] private AudioMixerGroup _mixer;
+    [SerializeField] private VolumeController _volumeController;
     [SerializeField] private Toggle _muteToggle;
+    [SerializeField] private Button[] _buttons;
+    [SerializeField] private AudioSource[] _sounds;
+    [SerializeField] private Slider[] _sliders;
 
-    [SerializeField] private Button _button1;
-    [SerializeField] private Button _button2;
-    [SerializeField] private Button _button3;
-
-    [SerializeField] private AudioSource _sound1;
-    [SerializeField] private AudioSource _sound2;
-    [SerializeField] private AudioSource _sound3;
-
-    [SerializeField] private Slider _sliderMaster;
-    [SerializeField] private Slider _sliderMusic;
-    [SerializeField] private Slider _sliderEffects;
-
-    private float _minVolumeDB = -80;
-    private float _maxVolumeDB = 0;
 
     private void OnEnable()
     {
-        _muteToggle.onValueChanged.AddListener(OnMuteToogle);
+        _muteToggle.onValueChanged.AddListener(_volumeController.OnMuteToggle);
 
-        _button1.onClick.AddListener(() => PlaySound(_sound1));
-        _button2.onClick.AddListener(() => PlaySound(_sound2));
-        _button3.onClick.AddListener(() => PlaySound(_sound3));
-
-        _sliderMaster.onValueChanged.AddListener(value => SetVolume(MasterName, value));
-        _sliderMusic.onValueChanged.AddListener(value => SetVolume(MusicName, value));
-        _sliderEffects.onValueChanged.AddListener(value => SetVolume(EffectName, value));
+        SubscribeButtons();
+        SubscribeSliders();
     }
 
     private void OnDisable()
     {
         _muteToggle.onValueChanged.RemoveAllListeners();
 
-        _button1.onClick.RemoveAllListeners();
-        _button2.onClick.RemoveAllListeners();
-        _button3.onClick.RemoveAllListeners();
+        UnSubscribeButtons();
+        UnSubscribeSliders();
+    }
 
-        _sliderMaster.onValueChanged.RemoveAllListeners();
-        _sliderMusic.onValueChanged.RemoveAllListeners();
-        _sliderEffects.onValueChanged.RemoveAllListeners();
+    private void SubscribeButtons()
+    {
+        if (_buttons.Length != _sounds.Length)
+        {
+            Debug.LogError("Забыл добавить в массив кнопку или звук");
+            return;
+        }
+
+        for (int i = 0; i < _buttons.Length; i++)
+        {
+            int index = i;
+            AudioSource sound = _sounds[index];
+            _buttons[i].onClick.AddListener(() => PlaySound(sound));
+        }
+    }
+
+    private void UnSubscribeButtons()
+    {
+        for (int i = 0; i < _buttons.Length; i++)
+        {
+            _buttons[i].onClick.RemoveAllListeners();
+        }
+    }
+
+    private void SubscribeSliders()
+    {
+        if (_sliders.Length != _mixerNames.Length)
+        {
+            Debug.LogError("Забыл добавить в массив Слайдер или Имя микшера");
+            return;
+        }
+
+        for (int i = 0; i < _sliders.Length; i++)
+        {
+            string name = _mixerNames[i];
+            _sliders[i].onValueChanged.AddListener(value => _volumeController.SetVolume(name, value));
+        }
+    }
+
+    private void UnSubscribeSliders()
+    {
+        for (int i = 0; i < _sliders.Length; i++)
+        {
+            _sliders[i].onValueChanged.RemoveAllListeners();
+        }
     }
 
     public void PlaySound(AudioSource audioSource)
     {
         audioSource.Play();
-    }
-
-    public void OnMuteToogle(bool isOn)
-    {
-        if (isOn)
-        {
-            _mixer.audioMixer.SetFloat(MasterName, _maxVolumeDB);
-        }
-        else
-        {
-            _mixer.audioMixer.SetFloat(MasterName, _minVolumeDB);
-        }
-    }
-
-    public void SetVolume(string label, float volume)
-    {
-        _mixer.audioMixer.SetFloat(label, Mathf.Log10(volume) * _volumeToDbFactor);        
     }
 }
