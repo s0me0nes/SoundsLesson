@@ -3,11 +3,8 @@ using UnityEngine.Audio;
 
 public class VolumeController : MonoBehaviour
 {
-    public const string MasterName = "Master";
-    public const string MusicName = "MusicVolume";
-    public const string EffectName = "SFXVolume";
-
     private const float _volumeToDbFactor = 20;
+    private const string _masterName = "Master";
 
     [SerializeField] private AudioMixerGroup _mixer;
 
@@ -18,11 +15,11 @@ public class VolumeController : MonoBehaviour
     {
         if (isOn)
         {
-            _mixer.audioMixer.SetFloat(MasterName, _maxVolumeDB);
+            _mixer.audioMixer.SetFloat(_masterName, _maxVolumeDB);
         }
         else
         {
-            _mixer.audioMixer.SetFloat(MasterName, _minVolumeDB);
+            _mixer.audioMixer.SetFloat(_masterName, _minVolumeDB);
         }
     }
 

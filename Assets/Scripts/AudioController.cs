@@ -3,81 +3,55 @@ using UnityEngine.UI;
 
 public class AudioController : MonoBehaviour
 {
-
-    private readonly string[] _mixerNames =
-    {
-    VolumeController.MasterName,
-    VolumeController.MusicName,
-    VolumeController.EffectName
-    };
-
+    [SerializeField] private PlayBinding[] _playBindings;
+    [SerializeField] private VolumeBinding[] _volumeBindings;
     [SerializeField] private VolumeController _volumeController;
     [SerializeField] private Toggle _muteToggle;
-    [SerializeField] private Button[] _buttons;
-    [SerializeField] private AudioSource[] _sounds;
-    [SerializeField] private Slider[] _sliders;
-
 
     private void OnEnable()
     {
         _muteToggle.onValueChanged.AddListener(_volumeController.OnMuteToggle);
 
-        SubscribeButtons();
-        SubscribeSliders();
+        SubscribeAll();
     }
 
     private void OnDisable()
     {
         _muteToggle.onValueChanged.RemoveAllListeners();
 
-        UnSubscribeButtons();
-        UnSubscribeSliders();
+        UnSubscribeAll();
     }
 
-    private void SubscribeButtons()
+    private void SubscribeAll()
     {
-        if (_buttons.Length != _sounds.Length)
+        for (int i = 0; i < _playBindings.Length; i++)
         {
-            Debug.LogError("Забыл добавить в массив кнопку или звук");
-            return;
+            Button button = _playBindings[i].PlayButton;
+            AudioSource audio = _playBindings[i].AudioSource;
+
+
+            button.onClick.AddListener(() => PlaySound(audio));
         }
 
-        for (int i = 0; i < _buttons.Length; i++)
+        for (int i = 0; i < _volumeBindings.Length; i++)
         {
-            int index = i;
-            AudioSource sound = _sounds[index];
-            _buttons[i].onClick.AddListener(() => PlaySound(sound));
-        }
-    }
+            Slider volumeSlider = _volumeBindings[i].VolumeSlider;
+            string name = _volumeBindings[i].MixerName;
 
-    private void UnSubscribeButtons()
-    {
-        for (int i = 0; i < _buttons.Length; i++)
-        {
-            _buttons[i].onClick.RemoveAllListeners();
+            volumeSlider.onValueChanged.AddListener(value => _volumeController.SetVolume(name, value));
         }
     }
 
-    private void SubscribeSliders()
+    private void UnSubscribeAll()
     {
-        if (_sliders.Length != _mixerNames.Length)
+        for (int i = 0; i < _playBindings.Length; i++)
         {
-            Debug.LogError("Забыл добавить в массив Слайдер или Имя микшера");
-            return;
+            _playBindings[i].PlayButton.onClick.RemoveAllListeners();
         }
 
-        for (int i = 0; i < _sliders.Length; i++)
+        for (int i = 0; i < _volumeBindings.Length; i++)
         {
-            string name = _mixerNames[i];
-            _sliders[i].onValueChanged.AddListener(value => _volumeController.SetVolume(name, value));
-        }
-    }
-
-    private void UnSubscribeSliders()
-    {
-        for (int i = 0; i < _sliders.Length; i++)
-        {
-            _sliders[i].onValueChanged.RemoveAllListeners();
+            _volumeBindings[i].VolumeSlider.onValueChanged.RemoveAllListeners();
         }
     }
 

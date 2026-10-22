@@ -262,17 +262,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1e5233550379e84aae97efada39e190, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioController
+  _playBindings:
+  - PlayButton: {fileID: 163863797}
+    AudioSource: {fileID: 1404969723}
+  - PlayButton: {fileID: 1572950935}
+    AudioSource: {fileID: 892538655}
+  - PlayButton: {fileID: 1514655039}
+    AudioSource: {fileID: 1471879037}
+  _volumeBindings:
+  - MixerName: Master
+    VolumeSlider: {fileID: 1838452729}
+  - MixerName: MusicVolume
+    VolumeSlider: {fileID: 1033683776}
+  - MixerName: SFXVolume
+    VolumeSlider: {fileID: 1391097584}
   _volumeController: {fileID: 13525440}
   _muteToggle: {fileID: 1377756218}
-  _button1: {fileID: 163863797}
-  _button2: {fileID: 1572950935}
-  _button3: {fileID: 1514655039}
-  _sound1: {fileID: 1404969723}
-  _sound2: {fileID: 892538655}
-  _sound3: {fileID: 1471879037}
-  _sliderMaster: {fileID: 1838452729}
-  _sliderMusic: {fileID: 1033683776}
-  _sliderEffects: {fileID: 1391097584}
 --- !u!114 &13525440
 MonoBehaviour:
   m_ObjectHideFlags: 0
